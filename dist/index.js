@@ -92,6 +92,7 @@
             height: React.PropTypes.number,
             color: React.PropTypes.arrayOf(React.PropTypes.number),
             style: React.PropTypes.object,
+            borderStyle: React.PropTypes.object,
 
             onDropFile: React.PropTypes.func,
             onLoadFailure: React.PropTypes.func,
@@ -109,6 +110,7 @@
                 height: 200,
                 color: [0, 0, 0, 0.5],
                 style: {},
+                borderStyle: {},
                 onDropFile: function onDropFile() {},
                 onLoadFailure: function onLoadFailure() {},
                 onLoadSuccess: function onLoadSuccess() {},
@@ -305,6 +307,7 @@
             var borderRadius = this.props.borderRadius;
             var height = dimensions.canvas.height;
             var width = dimensions.canvas.width;
+            var borderStyle = this.props.borderStyle;
 
             // clamp border radius between zero (perfect rectangle) and half the size without borders (perfect circle or "pill")
             borderRadius = Math.max(borderRadius, 0);
@@ -314,6 +317,11 @@
             drawRoundedRect(context, borderSize, borderSize, width - borderSize * 2, height - borderSize * 2, borderRadius); // inner rect, possibly rounded
             context.rect(width, 0, -width, height); // outer rect, drawn "counterclockwise"
             context.fill();
+
+            if (Object.keys(borderStyle).length > 0) {
+                context.strokeStyle = borderStyle.color;
+                context.strokeRect(borderStyle.x, borderStyle.y, borderStyle.width, borderStyle.height);
+            }
 
             context.restore();
         },
