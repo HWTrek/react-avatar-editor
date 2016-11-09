@@ -43,13 +43,18 @@ module.exports = MyEditor;
 | style                  | Object   | Styles for the canvas element
 | scale                  | Number   | The scale of the image. You can use this to add your own resizing slider.
 | onDropFile(event)      | function | Invoked when user drops a file (or more) onto the canvas. Does not perform any further check.
-| onLoadSuccess(imgInfo) | function | Invoked when an image (whether passed by props or dropped) load succeeds.
 | onLoadFailure(event)   | function | Invoked when an image (whether passed by props or dropped) load fails.
+| onLoadSuccess(imgInfo) | function | Invoked when an image (whether passed by props or dropped) load succeeds.
+| onImageReady(event)    | function | Invoked when the image is painted on the canvas the first time
 | onMouseUp()            | function | Invoked when the user releases their mouse button after interacting with the editor.
+| onMouseMove()          | function | Invoked when the user hold and moving the image.
+| onImageChange()        | function | Invoked when the user changed the image. Not invoked on the first render, and invoked multiple times during drag, etc.
 
 ## Accessing the resulting image
 
-The size of the resulting image will have the width and the height of the editor - minus the borders.
+The resulting image will have the same resolution as the original image, regardless of the editor's size.
+If you want the image sized in the dimensions of the canvas you can use `getImageScaledToCanvas`.
+
 
 ```javascript
 
@@ -58,12 +63,16 @@ var React = require('react'),
 
 var MyEditor = React.createClass({
   onClickSave: function() {
-    var dataURL = this.refs.editor.getImage();
-    // now save it to the state and set it as <img src="…" /> or send it somewhere else
+    var canvas = this.refs.editor.getImage(); // This is a HTMLCanvasElement.
+    // It can be made into a data URL or a blob, drawn on another canvas, or added to the DOM.
+    
+    // If you want the image resized to the canvas size (also a HTMLCanvasElement)
+    var canvasScaled = this.refs.editor.getImageScaledToCanvas();
   },
   render: function() {
     return (
         <AvatarEditor
+          ref="editor"
           image="http://example.com/initialimage.jpg"
           width={250}
           height={250}
@@ -87,11 +96,12 @@ all relative to the image size (that is, comprised between 0 and 1). It is a met
 like ``getImage()``.
 
 
-# Development
+# Contributing
 
 For development you can use following build tools:
 
-* `npm run build`: Builds a minified dist file: `dist/index.js`
-* `npm run build-debug`: Builds an unminified dist file: `dist/index.js`
-* `npm run watch`: Watches for file changes and builds unminified into: `dist/index.js`
+* `npm run build`: Builds the *minified* dist file: `dist/index.js`
+* `npm run watch`: Watches for file changes and builds *unminified* into: `dist/index.js`
 * `npm run demo`: Builds the demo based on the dist file `dist/index.js`
+
+**Please always run `npm run build` in your pull request.**
